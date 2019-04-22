@@ -1,12 +1,14 @@
+let ctx;
 (function iife() {
     const canvas = document.querySelector('#canvas2');
+    const couponSVGEl = document.getElementById('coupon-animation-svg');
     canvas.width = 250;
     canvas.height = 265;
 
-    const ctx = canvas.getContext('2d');
+    ctx = canvas.getContext('2d');
 
     ctx.lineWidth = 3;
-    ctx.strokeStyle = '#0272A2';
+    ctx.strokeStyle = '#0485cc';
 
     const animatePathDrawing = (ctx, x0, y0, x1, y1, x2, y2, duration) => {
         let start = null;
@@ -15,8 +17,6 @@
             if (start === null) start = timestamp;
             let delta = timestamp - start;
             let progress = Math.min(delta / duration, 1);
-
-            ctx.clearRect(x0, y0, 1, 1);
 
             drawBezierSplit(ctx, x0, y0, x1, y1, x2, y2, 0, progress);
 
@@ -71,10 +71,6 @@
     let brl = 130;
     let ml = 110;
     let lol = 135;
-    let tc1 = 113;
-    let tc2 = 100;
-    let qc1 = 118;
-    let qc2 = 90;
 
     const firstAnimation = () => {
         if (f < 194) {
@@ -82,7 +78,7 @@
         } else {
             topRightAnime(null, 1.5709, null);
         }
-        ctx.clearRect(0, 0, 500, 500);
+        ctx.clearRect(0, 0, 250, 265);
         ctx.beginPath();
         animatePathDrawing(ctx, 138, 100, 132, 90, 150, 75, 300);
         ctx.stroke();
@@ -134,16 +130,9 @@
         brl += 3.36;
         ml += 0.86;
         lol += 2.9;
-        tc1 += 0.69;
-        tc2 -= 1.27;
-        qc1 -= 1.04;
-        qc2 -= 0.87;
     };
 
     let t = 0;
-    let bc1 = 100;
-    let bc2 = 75;
-    let bc3 = 100;
     const topRightAnime = (first, second, third, fourth) => {
         const topRightArc = (Math.PI * 2 * t) / 100 + Math.PI / -2;
         const bottomLeftArc = (Math.PI * 2 * t) / 100 + Math.PI / 2;
@@ -156,7 +145,7 @@
         } else {
             sideLineRight();
         }
-        ctx.clearRect(0, 0, 500, 500);
+        ctx.clearRect(0, 0, 250, 265);
         ctx.beginPath();
         ctx.moveTo(138, 100);
         ctx.quadraticCurveTo(132, 90, 150, 75);
@@ -210,25 +199,19 @@
         ctx.arc(57, 123, 7, 1.570795, second, false);
         ctx.stroke();
         t += 4;
-        bc1 -= 1.6;
-        bc2 -= 1.6;
-        bc3 -= 3.2;
     };
 
     let slr = 107;
     let sll = 124;
     let bll = 67;
     let blr = 183;
-    let sbc1 = 80;
-    let sbc2 = 75;
-    let sbc3 = 80;
     const sideLineRight = () => {
         if (slr < 124) {
             requestAnimationFrame(sideLineRight);
         } else {
             bottomRightAnime();
         }
-        ctx.clearRect(0, 0, 500, 500);
+        ctx.clearRect(0, 0, 250, 265);
         ctx.beginPath();
         ctx.moveTo(138, 100);
         ctx.quadraticCurveTo(132, 90, 150, 75);
@@ -295,9 +278,6 @@
         slr += 2;
         bll += 6.8;
         blr -= 6.8;
-        sbc1 -= 1.17;
-        sbc2 += 1.17;
-        sbc3 += 0.59;
     };
 
     let bra = 0;
@@ -306,8 +286,10 @@
         const topLeftArc = (Math.PI * bra) / 50 + Math.PI;
         if (bra < 25) {
             requestAnimationFrame(() => bottomRightAnime(bottomRightArc, topLeftArc));
+        } else {
+            shrinkAndGrow();
         }
-        ctx.clearRect(0, 0, 500, 500);
+        ctx.clearRect(0, 0, 250, 265);
         ctx.beginPath();
         ctx.moveTo(138, 100);
         ctx.quadraticCurveTo(132, 90, 150, 75);
@@ -375,6 +357,100 @@
         ctx.arc(57, 107, 7, 3.14159, second, false);
         ctx.stroke();
         bra += 4;
+    };
+
+    const shrinkAndGrow = () => {
+        canvas.classList.add('coupon-animation_gift-shrink');
+        setTimeout(() => {
+            ctx.clearRect(0, 0, 250, 265);
+            canvas.classList.add('coupon-animation_coupon-grow');
+            canvas.classList.remove('coupon-animation_gift-shrink');
+            couponSVGEl.classList.add('coupon-animation-svg_grow');
+            setTimeout(addFireworks, 400);
+        }, 700);
+    };
+
+    function Circle(dx, dy, radius, strokeOrFill) {
+        this.x = 125;
+        this.y = 132;
+        this.dx = dx;
+        this.dy = dy;
+        this.radius = radius;
+
+        this.draw = function() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+            ctx.strokeStyle = 'rgba(4,133,204, 0.4)';
+            ctx.fillStyle = 'rgba(4,133,204, 0.4)';
+            if (strokeOrFill) {
+                ctx.stroke();
+            } else {
+                ctx.fill();
+            }
+        };
+
+        this.update = function() {
+            this.x += this.dx;
+            this.y += this.dy;
+
+            this.draw();
+        };
+    }
+
+    function Square(dx, dy, size, width, strokeOrFill) {
+        this.x = 125;
+        this.y = 132;
+        this.dx = dx;
+        this.dy = dy;
+        this.size = size * 2;
+        this.width = width * 2;
+
+        this.draw = function() {
+            ctx.beginPath();
+            ctx.strokeStyle = 'rgba(4,133,204, 0.4)';
+            ctx.fillStyle = 'rgba(4,133,204, 0.4)';
+            if (strokeOrFill) {
+                ctx.strokeRect(this.x, this.y, this.size, this.width);
+            } else {
+                ctx.fillRect(this.x, this.y, this.size, this.width);
+            }
+        };
+
+        this.update = function() {
+            this.x += this.dx;
+            this.y += this.dy;
+
+            this.draw();
+        };
+    }
+
+    const addFireworks = () => {
+        const circleArray = [];
+        for (let i = 0; i < 40; i++) {
+            let radius = Math.random() * 5;
+            let width = Math.random() * 5;
+            let dx = (Math.random() - 0.5) * 10;
+            let dy = (Math.random() - 0.5) * 10;
+            const strokeOrFill = i % 2 === 0;
+            const circle = new Circle(dx, dy, radius, strokeOrFill);
+            const square = new Square(dx, dy, radius, width, strokeOrFill);
+            strokeOrFill ? circleArray.push(circle) : circleArray.push(square);
+        }
+
+        const animate = () => {
+            ctx.lineWidth = 2;
+            couponSVGEl.style.display = 'block';
+            requestAnimationFrame(animate);
+            ctx.clearRect(0, 0, innerWidth, innerHeight);
+            circleArray.forEach(circle => {
+                circle.update();
+            });
+            setTimeout(() => {
+                canvas.classList.add('coupon-animation_coupon-fade');
+            }, 800);
+        };
+
+        animate();
     };
 
     firstAnimation();
